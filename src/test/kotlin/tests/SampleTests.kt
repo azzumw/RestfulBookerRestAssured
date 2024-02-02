@@ -84,10 +84,8 @@ class SampleTests {
             .header("Content-Type","application/json")
             .header("Authorization","Basic YWRtaW46cGFzc3dvcmQxMjM=")
             .cookie("Cookie: token=",token)
-            .auth()
-            .basic("Basic","YWRtaW46cGFzc3dvcmQxMjM=")
             . `when`()
-            .delete("/108")
+            .delete("/109")
             .then().statusCode(201).log().all()
     }
 }
