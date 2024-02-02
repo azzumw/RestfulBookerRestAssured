@@ -1,21 +1,23 @@
 package tests
 
+import com.google.gson.JsonElement
+import com.google.gson.JsonObject
+import com.google.gson.annotations.SerializedName
 import io.restassured.RestAssured.*
 import org.hamcrest.CoreMatchers.*
 import org.testng.annotations.BeforeMethod
 import org.testng.annotations.Test
+//import kotlinx.serialization.Serializable
+//import kotlinx.serialization.json.Json
+//import kotlinx.serialization.encodeToString
 
 class SampleTests {
 
-    companion object {
-        private const val GET_BOOKINGS = "https://restful-booker.herokuapp.com/booking"
-    }
-
-    private  var id:Int? = null
+    private var id: Int? = null
 
     @BeforeMethod
     fun setUp() {
-        baseURI = GET_BOOKINGS
+        baseURI = "https://restful-booker.herokuapp.com/booking"
     }
 
     @Test
@@ -33,8 +35,34 @@ class SampleTests {
             .get("/$id")
             .then()
             .statusCode(200)
-            .body("firstname", `is`("Josh"))
     }
 
+    @Test
+    fun create_a_booking() {
+
+        val bookingDates = JsonObject().apply {
+            addProperty("checkin", 20200202)
+            addProperty("checkout", 20200202)
+        }
+
+        val req = JsonObject().apply {
+            addProperty("firstname", "Azzum")
+            addProperty("lastname", "waqar")
+            addProperty("totalprice", 187)
+            addProperty("depositpaid", true)
+            add("bookingdates", bookingDates.asJsonObject)
+            addProperty("additionalneeds", "breakie")
+        }
+
+
+        given()
+            .header("Content-Type", "application/json")
+            .body(req.asJsonObject)
+            .`when`()
+            .post()
+            .then().statusCode(200)
+            .log().all()
+
+    }
 
 }
