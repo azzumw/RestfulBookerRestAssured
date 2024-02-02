@@ -1,17 +1,17 @@
 package tests
 
-import com.google.gson.JsonElement
 import com.google.gson.JsonObject
-import com.google.gson.annotations.SerializedName
 import io.restassured.RestAssured.*
 import org.hamcrest.CoreMatchers.*
 import org.testng.annotations.BeforeMethod
 import org.testng.annotations.Test
-//import kotlinx.serialization.Serializable
-//import kotlinx.serialization.json.Json
-//import kotlinx.serialization.encodeToString
+
 
 class SampleTests {
+
+    companion object{
+        private const val AUTH_REQUEST = "https://restful-booker.herokuapp.com/auth"
+    }
 
     private var id: Int? = null
 
@@ -65,4 +65,29 @@ class SampleTests {
 
     }
 
+    @Test
+    fun delete_a_booking_with_id() {
+
+        val req = JsonObject().apply {
+            addProperty("username", "admin")
+            addProperty("password", "password123")
+        }
+
+        val token = given()
+            .header("Content-Type", "application/json")
+            .body(req.asJsonObject)
+            .`when`()
+            .post(AUTH_REQUEST).body().`as`(JsonObject::class.java).get("token")
+
+
+        given()
+            .header("Content-Type","application/json")
+            .header("Authorization","Basic YWRtaW46cGFzc3dvcmQxMjM=")
+            .cookie("Cookie: token=",token)
+            .auth()
+            .basic("Basic","YWRtaW46cGFzc3dvcmQxMjM=")
+            . `when`()
+            .delete("/108")
+            .then().statusCode(201).log().all()
+    }
 }
