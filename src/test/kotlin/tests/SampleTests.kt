@@ -98,18 +98,18 @@ class SampleTests {
     @Test(priority = 3)
     fun update_a_booking_with_id() {
 
-//        val req = JsonObject().apply {
-//            addProperty("username", "admin")
-//            addProperty("password", "password123")
-//        }
-//
-//        val token = given()
-//            .header("Content-Type", "application/json")
-//            .body(req.asJsonObject)
-//            .`when`()
-//            .post(AUTH_REQUEST).body().`as`(JsonObject::class.java).get("token").asString
+        val req = JsonObject().apply {
+            addProperty("username", "admin")
+            addProperty("password", "password123")
+        }
 
-//        println("Cookie: token=${token}")
+        val token = given()
+            .header("Content-Type", "application/json")
+            .body(req.asJsonObject)
+            .`when`()
+            .post(AUTH_REQUEST).body().`as`(JsonObject::class.java).get("token").asString
+
+        println("Cookie: token=${token}")
 
         val bookingDates = JsonObject().apply {
             addProperty("checkin", 20200202)
@@ -125,14 +125,16 @@ class SampleTests {
             addProperty("additionalneeds", "dinner")
         }
 
-        println("$baseURI/444")
+        println("$AUTH_REQUEST/booking/444")
 
         given()
+            .auth().preemptive().basic("admin","password123")
             .header("Content-Type","application/json")
             .header("Accept","application/json")
             .header("Authorization","Basic YWRtaW46cGFzc3dvcmQxMjM=")
-            .body(updateRequest)
-        `when`().put("/345")
+            .cookie(token)
+            .body(updateRequest.asJsonObject)
+        `when`().put("/444")
             .then().statusCode(200)
     }
 }
