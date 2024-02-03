@@ -2,8 +2,6 @@ package tests
 
 import com.google.gson.JsonObject
 import io.restassured.RestAssured.*
-import io.restassured.builder.RequestSpecBuilder
-import io.restassured.config.EncoderConfig
 import io.restassured.http.ContentType
 import org.hamcrest.CoreMatchers.*
 import org.testng.annotations.BeforeMethod
@@ -12,13 +10,13 @@ import org.testng.annotations.Test
 
 class SampleTests {
 
-    companion object{
+    companion object {
         private const val BASE_URL = "https://restful-booker.herokuapp.com"
         private const val AUTH_REQUEST = "https://restful-booker.herokuapp.com/auth"
     }
 
-    private var id: Int? = null
-    private var bookingId:Int? = null
+
+    private var bookingId: Int? = null
 
     @BeforeMethod
     fun setUp() {
@@ -76,23 +74,10 @@ class SampleTests {
     @Test(priority = 4)
     fun delete_a_booking_with_id() {
 
-//        val req = JsonObject().apply {
-//            addProperty("username", "admin")
-//            addProperty("password", "password123")
-//        }
-//
-//        val token = given()
-//            .header("Content-Type", "application/json")
-//            .body(req.asJsonObject)
-//            .`when`()
-//            .post(AUTH_REQUEST).body().`as`(JsonObject::class.java).get("token")
-
-
         given()
-            .header("Content-Type","application/json")
-            .header("Authorization","Basic YWRtaW46cGFzc3dvcmQxMjM=")
-//            .cookie("Cookie: token=",token)
-            . `when`()
+            .header("Content-Type", "application/json")
+            .header("Authorization", "Basic YWRtaW46cGFzc3dvcmQxMjM=")
+            .`when`()
             .delete("/$bookingId")
             .then().statusCode(201).log().all()
     }
@@ -117,12 +102,9 @@ class SampleTests {
 
 
         given().log().all()
-//            .spec(RequestSpecBuilder().setUrlEncodingEnabled(false).build())
-//            .config(config().encoderConfig(EncoderConfig.encoderConfig().appendDefaultContentCharsetToContentTypeIfUndefined(false)))
-//            .auth().preemptive().basic("admin","password123")
             .contentType(ContentType.JSON)
-            .header("Accept","application/json")
-            .header("Authorization","Basic YWRtaW46cGFzc3dvcmQxMjM=")
+            .header("Accept", "application/json")
+            .header("Authorization", "Basic YWRtaW46cGFzc3dvcmQxMjM=")
             .body(updateRequest.asJsonObject)
             .`when`().put("/$bookingId")
             .then().statusCode(200).log().all()
