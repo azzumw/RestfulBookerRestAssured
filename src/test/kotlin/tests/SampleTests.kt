@@ -2,6 +2,8 @@ package tests
 
 import com.google.gson.JsonObject
 import io.restassured.RestAssured.*
+import io.restassured.builder.RequestSpecBuilder
+import io.restassured.config.EncoderConfig
 import io.restassured.http.ContentType
 import org.hamcrest.CoreMatchers.*
 import org.testng.annotations.BeforeMethod
@@ -74,16 +76,16 @@ class SampleTests {
     @Test(priority = 4)
     fun delete_a_booking_with_id() {
 
-        val req = JsonObject().apply {
-            addProperty("username", "admin")
-            addProperty("password", "password123")
-        }
-
-        val token = given()
-            .header("Content-Type", "application/json")
-            .body(req.asJsonObject)
-            .`when`()
-            .post(AUTH_REQUEST).body().`as`(JsonObject::class.java).get("token")
+//        val req = JsonObject().apply {
+//            addProperty("username", "admin")
+//            addProperty("password", "password123")
+//        }
+//
+//        val token = given()
+//            .header("Content-Type", "application/json")
+//            .body(req.asJsonObject)
+//            .`when`()
+//            .post(AUTH_REQUEST).body().`as`(JsonObject::class.java).get("token")
 
 
         given()
@@ -91,25 +93,13 @@ class SampleTests {
             .header("Authorization","Basic YWRtaW46cGFzc3dvcmQxMjM=")
 //            .cookie("Cookie: token=",token)
             . `when`()
-            .delete("/110")
+            .delete("/$bookingId")
             .then().statusCode(201).log().all()
     }
 
     @Test(priority = 3)
     fun update_a_booking_with_id() {
-
-        val req = JsonObject().apply {
-            addProperty("username", "admin")
-            addProperty("password", "password123")
-        }
-
-        val token = given()
-            .header("Content-Type", "application/json")
-            .body(req.asJsonObject)
-            .`when`()
-            .post(AUTH_REQUEST).body().`as`(JsonObject::class.java).get("token").asString
-
-        println("Cookie: token=${token}")
+        bookingId = bookingId ?: get().body.path("[0].bookingid")
 
         val bookingDates = JsonObject().apply {
             addProperty("checkin", 20200202)
@@ -117,24 +107,24 @@ class SampleTests {
         }
 
         val updateRequest = JsonObject().apply {
-            addProperty("firstname", "Thomas")
-            addProperty("lastname", "Paine")
+            addProperty("firstname", "Bruce")
+            addProperty("lastname", "Eckel")
             addProperty("totalprice", 176)
             addProperty("depositpaid", false)
             add("bookingdates", bookingDates.asJsonObject)
             addProperty("additionalneeds", "dinner")
         }
 
-        println("$AUTH_REQUEST/booking/444")
 
-        given()
-            .auth().preemptive().basic("admin","password123")
-            .header("Content-Type","application/json")
+        given().log().all()
+//            .spec(RequestSpecBuilder().setUrlEncodingEnabled(false).build())
+//            .config(config().encoderConfig(EncoderConfig.encoderConfig().appendDefaultContentCharsetToContentTypeIfUndefined(false)))
+//            .auth().preemptive().basic("admin","password123")
+            .contentType(ContentType.JSON)
             .header("Accept","application/json")
             .header("Authorization","Basic YWRtaW46cGFzc3dvcmQxMjM=")
-            .cookie(token)
             .body(updateRequest.asJsonObject)
-        `when`().put("/444")
-            .then().statusCode(200)
+            .`when`().put("/$bookingId")
+            .then().statusCode(200).log().all()
     }
 }
